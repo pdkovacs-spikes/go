@@ -7,10 +7,8 @@ import (
 )
 
 const (
-	errorValue          = -1.0
-	OtelScope           = "http://otel-integration"
-	MetricsPath         = "/metrics"
-	MetricsEndpointPort = ":2223"
+	errorValue = -1.0
+	OtelScope  = "http://otel-integration"
 )
 
 // Function to get metrics values from runtime/metrics package

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"net/http"
+	"net/url"
 	"os"
 	"os/signal"
 	"otel-grafana-stack/internal/metadata"
@@ -12,9 +12,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/prometheus"
+	"go.opentelemetry.io/otel/exporters/otlp/otlpmetric/otlpmetrichttp"
 	api "go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/sdk/metric"
 	sdkmetric "go.opentelemetry.io/otel/sdk/metric"
@@ -27,17 +26,23 @@ func main() {
 	ctx := context.Background()
 	ctx, _ = signal.NotifyContext(ctx, os.Interrupt)
 
-	// The exporter embeds a default OpenTelemetry Reader and
-	// implements prometheus.Collector, allowing it to be used as
-	// both a Reader and Collector.
-	// exporter, err := prometheus.New()
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-
-	exporter, err := prometheus.New()
+	endpointUrl := "http://alloy:4318"
+	endpoint, err := url.Parse(endpointUrl)
 	if err != nil {
-		log.Fatal(err)
+		panic(fmt.Sprintf("parsing endpoint url: %v", err))
+	}
+	insecure := endpoint.Scheme == "http"
+	// protocol := "http/protobuf"
+
+	var exporter sdkmetric.Exporter
+
+	if insecure {
+		exporter, err = otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpoint(endpoint.Host), otlpmetrichttp.WithInsecure())
+	} else {
+		exporter, err = otlpmetrichttp.New(ctx, otlpmetrichttp.WithEndpoint(endpoint.Host))
+	}
+	if err != nil {
+		panic(fmt.Sprintf("parsing endpoint url: %v", err))
 	}
 
 	serviceComponent := "main"
@@ -45,7 +50,7 @@ func main() {
 	serviceNamespace := "bitkit/otel-grafana-stack"
 	serviceInstanceID := "local"
 
-	// We discard the error here as it cannot possibly take place with the parameters we use.
+	// See also https://github.com/pdkovacs/forked-quickpizza/commit/a5835b3b84d4ae995b8b886a6982a59f3997af2e
 	res, _ := resource.Merge(
 		resource.Default(),
 		resource.NewWithAttributes(
@@ -56,13 +61,15 @@ func main() {
 			attribute.KeyValue{Key: "service.instance.id", Value: attribute.StringValue(serviceInstanceID)},
 		),
 	)
+	metricReader := sdkmetric.NewPeriodicReader(exporter, sdkmetric.WithInterval(5*time.Second))
 
 	// Register the prometheus Collector to receive metrics from the go runtime package metrics
 	provider := metric.NewMeterProvider(
-		sdkmetric.WithReader(exporter),
+		sdkmetric.WithReader(metricReader),
 		sdkmetric.WithResource(res),
 	)
 	addBuiltInGoMetricsToOTEL(provider)
+
 	apiCounter := getExampleCustomMetric(provider)
 
 	go func() {
@@ -73,24 +80,7 @@ func main() {
 		}
 	}()
 
-	// Start the prometheus HTTP server and pass the exporter Collector to it
-	go serveMetrics()
-
 	<-ctx.Done()
-}
-
-// serveMetrics function to start prometheus server
-func serveMetrics() {
-	log.Printf("serving metrics at localhost%s%s", metadata.MetricsEndpointPort, metadata.MetricsPath)
-
-	// Serve metrics using the custom registry
-	http.Handle(metadata.MetricsPath, promhttp.Handler())
-
-	err := http.ListenAndServe(metadata.MetricsEndpointPort, nil)
-	if err != nil {
-		fmt.Printf("error serving http: %v", err)
-		return
-	}
 }
 
 // addMetricsToPrometheusRegistry function to add metrics to prometheus registry
