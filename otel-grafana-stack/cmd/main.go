@@ -71,11 +71,18 @@ func main() {
 	addBuiltInGoMetricsToOTEL(provider)
 
 	apiCounter := getExampleCustomMetric(provider)
+	outcomeKey := attribute.Key("outcome")
 
 	go func() {
+		i := 0
 		for {
+			i++
+			outcome := "success"
+			if i%3 == 0 {
+				outcome = "failure"
+			}
 			log.Printf("incrementing api.counter by 1\n")
-			apiCounter.Add(ctx, 1)
+			apiCounter.Add(ctx, 1, api.WithAttributes(outcomeKey.String(outcome)))
 			<-time.After(time.Second)
 		}
 	}()
