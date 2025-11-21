@@ -2,7 +2,11 @@ FROM ubuntu
 
 RUN apt-get update && apt-get install iproute2 -y
 COPY ./cmd/otel-grafana-stack /bin
-# LABEL service.type="application" - used for scraped targets in the quickpizza env
-LABEL service.type="my-otlp-push-sample-service"
+# We want to use the same log-processing pipeline that the default quickpizza env
+# provides for containers labeled "applicatioin". The alloy configuration must,
+# nevertheless, be shaped such as to keep metric-processing pipelines separate
+# between legacy scraping and the OTLP push collection, which this test service uses
+# in order to avoid collisions between relabeling and transformations:
+LABEL service.type="application" 
 EXPOSE 2223
 CMD [ "/bin/otel-grafana-stack" ]
