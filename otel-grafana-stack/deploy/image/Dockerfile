@@ -1,7 +1,7 @@
 FROM ubuntu
 
-RUN apt-get update && apt-get install iproute2 -y
-COPY ./cmd/otel-grafana-stack /bin
+RUN apt-get update && apt-get install iproute2 netcat-traditional dnsutils curl -y
+COPY ./otel-grafana-stack /bin
 # We want to use the same log-processing pipeline that the default quickpizza env
 # provides for containers labeled "applicatioin". The alloy configuration must,
 # nevertheless, be shaped such as to keep metric-processing pipelines separate

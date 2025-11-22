@@ -1,0 +1,1 @@
+Current versions assume the availability of a local repository `${HOME}/github/pdkovacs/forked-quickpizza` — a slightly modified fork of `grafana/quickpizza`

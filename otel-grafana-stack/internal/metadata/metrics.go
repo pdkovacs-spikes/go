@@ -8,7 +8,7 @@ import (
 
 const (
 	errorValue = -1.0
-	OtelScope  = "http://otel-integration"
+	OtelScope  = "github.com:pdkovacs-spikes/go/otel-grafana-stack/main"
 )
 
 // Function to get metrics values from runtime/metrics package

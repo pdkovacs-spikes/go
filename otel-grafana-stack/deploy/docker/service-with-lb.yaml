@@ -1,0 +1,20 @@
+services:
+  my-otel-spike:
+    image: bitkit/otel-grafana-stack
+    labels:
+      - "service.type=application"
+    environment:
+      - SPIKE_OTLP_ENDPOINT=http://alloy:4318
+      - SPIKE_OTLP_SERVICE_NAMESPACE=bitkit
+      - SPIKE_OTLP_SERVICE_NAME=my-otel-spike
+    depends_on:
+      - alloy
+    deploy:
+      replicas: 4
+
+  envoy:
+    image: envoyproxy/envoy:v1.31-latest
+    volumes:
+      - $PWD/deploy/docker/envoy.yaml:/etc/envoy/envoy.yaml:ro
+    ports:
+      - "8080:8080" # LB entrypoint

@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose -f compose.grafana-local-stack.monolithic.yaml convert
+    kompose.version: 1.34.0 (cbf2835db)
+    service.type: instrumentation
+  labels:
+    io.kompose.service: tempo
+  name: tempo
+spec:
+  type: LoadBalancer
+  ports:
+    - name: "3200"
+      port: 3200
+      targetPort: 3200
+  selector:
+    io.kompose.service: tempo
