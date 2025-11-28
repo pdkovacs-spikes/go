@@ -8,3 +8,7 @@ alloy:
       targetPort: 4318
 service:
   type: LoadBalancer
+configMap:
+  create: false
+  name: config
+  key: config.alloy

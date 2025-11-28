@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-grafana-stack-app
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: otel-grafana-stack-app
+  template:
+    metadata:
+      labels:
+        app: otel-grafana-stack-app
+        service.type: application
+    spec:
+      containers:
+        - name: otel-grafana-stack-app
+          image: bitkit/otel-grafana-stack-app
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPIKE_OTLP_ENDPOINT
+              value: http://alloy.my-grafana.svc.cluster.local:4318
+            - name: SPIKE_OTLP_SERVICE_NAMESPACE
+              value: bitkit
+            - name: SPIKE_OTLP_SERVICE_NAME
+              value: my-otel-spike
+          resources:
+            requests:
+              memory: "30M"
+              cpu: "100m"
+            limits:
+              memory: "500M"
+              cpu: "100m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-grafana-stack-app
+  namespace: default
+spec:
+  selector:
+    app: otel-grafana-stack-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer

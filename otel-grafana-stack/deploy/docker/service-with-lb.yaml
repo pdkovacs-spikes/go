@@ -1,6 +1,6 @@
 services:
   my-otel-spike:
-    image: bitkit/otel-grafana-stack
+    image: bitkit/otel-grafana-stack-app
     labels:
       - "service.type=application"
     environment:

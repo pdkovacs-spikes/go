@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: prometheus-server-conf
-  namespace: monitoring
+  namespace: my-grafana
 data:
   prometheus.yml: |
     global:

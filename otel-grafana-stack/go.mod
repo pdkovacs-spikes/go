@@ -1,4 +1,4 @@
-module otel-grafana-stack
+module otel-grafana-stack-app
 
 go 1.25.4
 

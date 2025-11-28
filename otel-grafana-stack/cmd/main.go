@@ -10,7 +10,7 @@ import (
 	"net/url"
 	"os"
 	"os/signal"
-	"otel-grafana-stack/internal/metadata"
+	"otel-grafana-stack-app/internal/metadata"
 	"runtime/metrics"
 	"strings"
 	"time"
@@ -46,7 +46,7 @@ func main() {
 	i := 0
 
 	http.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, OLTP!\n")
+		io.WriteString(w, fmt.Sprintf("Hello, OLTP from %s!\n", getServiceInstanceID()))
 		i++
 		outcome := "success"
 		if i%(5+rand.Intn(2)) == 0 {
@@ -84,12 +84,7 @@ func initOtel(ctx context.Context) {
 	serviceComponent := "main"
 	serviceNamespace := os.Getenv("SPIKE_OTLP_SERVICE_NAMESPACE")
 	servcieName := os.Getenv("SPIKE_OTLP_SERVICE_NAME")
-	serviceInstanceID := os.Getenv("SPIKE_OTLP_SERVICE_INSTANCE_ID")
-	if len(serviceInstanceID) == 0 {
-		if serviceInstanceID, err = os.Hostname(); err != nil {
-			panic(fmt.Sprintf("failed to query hostname: %v\n", err))
-		}
-	}
+	serviceInstanceID := getServiceInstanceID()
 
 	// See also https://github.com/pdkovacs/forked-quickpizza/commit/a5835b3b84d4ae995b8b886a6982a59f3997af2e
 	res, _ := resource.Merge(
@@ -111,6 +106,17 @@ func initOtel(ctx context.Context) {
 	)
 	otel.SetMeterProvider(provider)
 	addBuiltInGoMetricsToOTEL()
+}
+
+func getServiceInstanceID() string {
+	serviceInstanceID := os.Getenv("SPIKE_OTLP_SERVICE_INSTANCE_ID")
+	var err error
+	if len(serviceInstanceID) == 0 {
+		if serviceInstanceID, err = os.Hostname(); err != nil {
+			panic(fmt.Sprintf("failed to query hostname: %v\n", err))
+		}
+	}
+	return serviceInstanceID
 }
 
 // addMetricsToPrometheusRegistry function to add metrics to prometheus registry

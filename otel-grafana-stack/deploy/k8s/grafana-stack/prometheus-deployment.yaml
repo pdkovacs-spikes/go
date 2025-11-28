@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus-server
-  namespace: monitoring
+  namespace: my-grafana
 spec:
   replicas: 1
   selector:
@@ -16,11 +16,26 @@ spec:
       containers:
         - name: prometheus
           image: prom/prometheus
+          command: ["/bin/prometheus"]
+          args:
+            [
+              "--web.enable-remote-write-receiver",
+              "--enable-feature=exemplar-storage",
+              "--enable-feature=native-histograms",
+              "--config.file=/etc/prometheus/prometheus.yml",
+            ]
           ports:
             - containerPort: 9090
           volumeMounts:
             - name: config-volume
               mountPath: /etc/prometheus
+          resources:
+            requests:
+              memory: "300M"
+              cpu: "100m"
+            limits:
+              memory: "300M"
+              cpu: "100m"
       volumes:
         - name: config-volume
           configMap:
