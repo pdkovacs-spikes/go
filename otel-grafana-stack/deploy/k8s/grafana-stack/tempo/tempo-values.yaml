@@ -1,0 +1,14 @@
+tempo:
+  extraPorts:
+    - name: "otlp-grpc"
+      port: 4317
+      targetPort: 4317
+    - name: "otlp-http"
+      port: 4318
+      targetPort: 4318
+service:
+  type: LoadBalancer
+configMap:
+  create: false
+  name: config
+  key: config.tempo

@@ -1,0 +1,64 @@
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: alloy
+  namespace: my-grafana
+spec:
+  virtualhost:
+    fqdn: alloy.internal
+  routes:
+    - services:
+        - name: alloy
+          port: 12345
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: grafana
+  namespace: my-grafana
+spec:
+  virtualhost:
+    fqdn: grafana.internal
+  routes:
+    - services:
+        - name: grafana
+          port: 3000
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: loki
+  namespace: my-grafana
+spec:
+  virtualhost:
+    fqdn: loki.internal
+  routes:
+    - services:
+        - name: loki
+          port: 3100
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: prometheus-service
+  namespace: my-grafana
+spec:
+  virtualhost:
+    fqdn: prometheus-service.internal
+  routes:
+    - services:
+        - name: prometheus-service
+          port: 80
+---
+apiVersion: projectcontour.io/v1
+kind: HTTPProxy
+metadata:
+  name: tempo
+  namespace: my-grafana
+spec:
+  virtualhost:
+    fqdn: tempo.internal
+  routes:
+    - services:
+        - name: tempo
+          port: 3200
