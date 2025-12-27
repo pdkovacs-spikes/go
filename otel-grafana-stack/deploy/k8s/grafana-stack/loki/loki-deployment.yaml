@@ -7,6 +7,7 @@ metadata:
     service.type: instrumentation
   labels:
     io.kompose.service: loki
+  namespace: my-grafana
   name: loki
 spec:
   replicas: 1
@@ -24,8 +25,26 @@ spec:
     spec:
       containers:
         - image: grafana/loki:3.4.3@sha256:5fe9fa99e9a747297cdf0239a5b25d192d8f668bd6505b09beef4dffcab5aac2
+          command: ["/usr/bin/loki"]
+          args:
+            ["-config.file=/etc/loki/local-config.yaml", "-print-config-stderr"]
           name: loki
           ports:
             - containerPort: 3100
               protocol: TCP
+          resources:
+            limits:
+              cpu: 1000m
+              memory: 500M
+            requests:
+              cpu: 1000m
+              memory: 500M
+          volumeMounts:
+            - name: loki-etc
+              mountPath: /etc/loki
+              readOnly: true
       restartPolicy: Always
+      volumes:
+        - name: loki-etc
+          configMap:
+            name: loki-local-config
