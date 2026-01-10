@@ -6,6 +6,23 @@ tempo:
     - name: "otlp-http"
       port: 4318
       targetPort: 4318
+  metricsGenerator:
+    enabled: true
+    remoteWriteUrl: "http://prometheus:9090/api/v1/write"
+  # Add advanced configuration not covered by shorthand keys
+  config: |
+    metrics_generator:
+      storage:
+        path: /var/tempo/generator/wal
+      traces_storage:
+        path: /var/tempo/generator/traces
+
+    overrides:
+      defaults:
+        metrics_generator:
+          processors:
+            - local-blocks   # Needed for count_over_time()
+            - span-metrics   # Needed for RED metrics
 service:
   type: LoadBalancer
 configMap:
