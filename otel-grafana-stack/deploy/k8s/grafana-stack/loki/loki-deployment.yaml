@@ -35,10 +35,10 @@ spec:
           resources:
             limits:
               cpu: 1000m
-              memory: 500M
+              memory: 2000M
             requests:
               cpu: 1000m
-              memory: 500M
+              memory: 2000M
           volumeMounts:
             - name: loki-etc
               mountPath: /etc/loki
