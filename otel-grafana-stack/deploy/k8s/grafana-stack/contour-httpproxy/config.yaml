@@ -2,7 +2,7 @@ apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
   name: alloy
-  namespace: my-grafana
+  namespace: monitoring
 spec:
   virtualhost:
     fqdn: alloy.internal
@@ -15,7 +15,7 @@ apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
   name: grafana
-  namespace: my-grafana
+  namespace: monitoring
 spec:
   virtualhost:
     fqdn: grafana.internal
@@ -28,7 +28,7 @@ apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
   name: loki
-  namespace: my-grafana
+  namespace: monitoring
 spec:
   virtualhost:
     fqdn: loki.internal
@@ -41,7 +41,7 @@ apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
   name: prometheus-service
-  namespace: my-grafana
+  namespace: monitoring
 spec:
   virtualhost:
     fqdn: prometheus-service.internal
@@ -54,7 +54,7 @@ apiVersion: projectcontour.io/v1
 kind: HTTPProxy
 metadata:
   name: tempo
-  namespace: my-grafana
+  namespace: monitoring
 spec:
   virtualhost:
     fqdn: tempo.internal

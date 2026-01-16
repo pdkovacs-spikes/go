@@ -22,7 +22,7 @@ spec:
             - containerPort: 8080
           env:
             - name: SPIKE_OTLP_ENDPOINT
-              value: http://alloy.my-grafana.svc.cluster.local:4318
+              value: http://alloy.monitoring.svc.cluster.local:4318
             - name: SPIKE_OTLP_SERVICE_NAMESPACE
               value: bitkit
             - name: SPIKE_OTLP_SERVICE_NAME

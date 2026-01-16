@@ -6,9 +6,10 @@ alloy:
     - name: "otlp-http"
       port: 4318
       targetPort: 4318
+  configMap:
+    create: false
+    name: alloy-config
+    key: config.alloy
+
 service:
   type: LoadBalancer
-configMap:
-  create: false
-  name: config
-  key: config.alloy
